@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "solanahackathon",
-    "slug": "solanahackathon",
+    "name": "TapWifSol",
+    "slug": "tapwifsol",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,14 +16,14 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.solana.mobile.expo.template"
+      "bundleIdentifier": "com.wisedavis.tapwifsol"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.solana.mobile.expo.template"
+      "package": "com.wisedavis.tapwifsol"
     },
     "web": {
       "favicon": "./assets/favicon.png"

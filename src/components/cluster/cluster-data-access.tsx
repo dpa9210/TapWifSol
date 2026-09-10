@@ -30,10 +30,19 @@ export function toWalletAdapterNetwork(
   }
 }
 
+// api.devnet.solana.com is heavily rate-limited (429s on airdrop/balance
+// calls within minutes). Ankr's public devnet RPC needs no API key but
+// returns JSON-RPC responses that fail @solana/web3.js's response schema
+// validation. Helius's devnet RPC is built for web3.js and holds up well.
+const heliusDevnetApiKey = process.env.EXPO_PUBLIC_HELIUS_DEVNET_API_KEY;
+const devnetEndpoint = heliusDevnetApiKey
+  ? `https://devnet.helius-rpc.com/?api-key=${heliusDevnetApiKey}`
+  : clusterApiUrl("devnet");
+
 export const defaultClusters: Readonly<Cluster[]> = [
   {
     name: "devnet",
-    endpoint: clusterApiUrl("devnet"),
+    endpoint: devnetEndpoint,
     network: ClusterNetwork.Devnet,
   },
   {

@@ -14,10 +14,15 @@ import {
   ActivityIndicator,
   DataTable,
   TextInput,
+  Surface,
+  IconButton,
 } from "react-native-paper";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ellipsify } from "../../utils/ellipsify";
 import { AppModal } from "../ui/app-modal";
+
+const BALANCE_HIDDEN_KEY = "tapwifsol.balanceHidden";
 
 function lamportsToSol(balance: number) {
   return Math.round((balance / LAMPORTS_PER_SOL) * 100000) / 100000;
@@ -25,15 +30,58 @@ function lamportsToSol(balance: number) {
 
 export function AccountBalance({ address }: { address: PublicKey }) {
   const query = useGetBalance({ address });
+  const theme = useTheme();
+  const [hidden, setHidden] = useState(false);
+
+  useEffect(() => {
+    AsyncStorage.getItem(BALANCE_HIDDEN_KEY).then((value) => {
+      if (value === "true") setHidden(true);
+    });
+  }, []);
+
+  const toggleHidden = () => {
+    setHidden((prev) => {
+      const next = !prev;
+      AsyncStorage.setItem(BALANCE_HIDDEN_KEY, String(next)).catch(() => {});
+      return next;
+    });
+  };
+
   return (
-    <>
-      <View style={styles.accountBalance}>
-        <Text variant="titleMedium">Current Balance</Text>
-        <Text variant="displayLarge">
-          {query.data ? lamportsToSol(query.data) : "..."} SOL
+    <Surface
+      style={[
+        styles.accountBalance,
+        { backgroundColor: theme.colors.primaryContainer },
+      ]}
+      elevation={1}
+    >
+      <View style={styles.balanceHeaderRow}>
+        <Text
+          variant="labelLarge"
+          style={{ color: theme.colors.onPrimaryContainer }}
+        >
+          Available Balance
         </Text>
+        <IconButton
+          icon={hidden ? "eye-off" : "eye"}
+          size={18}
+          onPress={toggleHidden}
+          iconColor={theme.colors.onPrimaryContainer}
+          style={styles.eyeButton}
+          accessibilityLabel={hidden ? "Show balance" : "Hide balance"}
+        />
       </View>
-    </>
+      <Text
+        variant="headlineLarge"
+        style={{ color: theme.colors.onPrimaryContainer, fontWeight: "bold" }}
+      >
+        {!query.data
+          ? "..."
+          : hidden
+            ? "•••••• SOL"
+            : `${lamportsToSol(query.data)} SOL`}
+      </Text>
+    </Surface>
   );
 }
 
@@ -62,25 +110,29 @@ export function AccountButtonGroup({ address }: { address: PublicKey }) {
           address={address}
         />
         <Button
-          mode="contained"
+          mode="contained-tonal"
+          icon="water"
           disabled={requestAirdrop.isPending}
           onPress={() => {
             setShowAirdropModal(true);
           }}
+          style={styles.groupButton}
         >
           Airdrop
         </Button>
         <Button
-          mode="contained"
+          mode="contained-tonal"
+          icon="arrow-up-bold"
           onPress={() => setShowSendModal(true)}
-          style={{ marginLeft: 6 }}
+          style={styles.groupButton}
         >
           Send
         </Button>
         <Button
-          mode="contained"
+          mode="contained-tonal"
+          icon="arrow-down-bold"
           onPress={() => setShowReceiveModal(true)}
-          style={{ marginLeft: 6 }}
+          style={styles.groupButton}
         >
           Receive
         </Button>
@@ -290,10 +342,26 @@ export function AccountTokenBalance({ address }: { address: PublicKey }) {
 const styles = StyleSheet.create({
   accountBalance: {
     marginTop: 12,
+    width: "100%",
+    borderRadius: 16,
+    padding: 16,
+  },
+  balanceHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  eyeButton: {
+    margin: 0,
   },
   accountButtonGroup: {
-    paddingVertical: 4,
+    paddingVertical: 12,
     flexDirection: "row",
+    width: "100%",
+  },
+  groupButton: {
+    flex: 1,
+    marginHorizontal: 4,
   },
   error: {
     color: "red",

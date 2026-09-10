@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Custom AID (Application ID) for our merchant HCE service, broadcasting
+  Solana Pay URLs as an NFC Type 4 Tag. Category "other" (not "payment")
+  so Android doesn't route taps through its system Tap & Pay picker, which
+  is reserved for real payment-card HCE apps (e.g. Google Wallet).
+-->
+<host-apdu-service xmlns:android="http://schemas.android.com/apk/res/android"
+                   android:description="@string/app_name"
+                   android:requireDeviceUnlock="false">
+  <aid-group android:category="other"
+             android:description="@string/app_name">
+    <aid-filter android:name="D2760000850101" />
+  </aid-group>
+</host-apdu-service>
