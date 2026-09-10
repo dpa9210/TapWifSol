@@ -1,4 +1,4 @@
-package com.wisedavis.tapwifsol
+package com.tapwifsol.app
 
 import android.os.Build
 import android.os.Bundle

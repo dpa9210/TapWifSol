@@ -86,9 +86,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.wisedavis.tapwifsol'
+    namespace 'com.tapwifsol.app'
     defaultConfig {
-        applicationId 'com.wisedavis.tapwifsol'
+        applicationId 'com.tapwifsol.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
