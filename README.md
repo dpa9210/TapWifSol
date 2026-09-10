@@ -1,105 +1,63 @@
-# Solana Mobile Expo Template
+# TapWifSol
 
-This template is a ready-to-go Android Expo dApp that offers:
+A mobile tap-to-pay app for the [Solana Mobile Hackathon](https://solanamobile.com/hackathon). One phone acts as a point-of-sale terminal; a customer either **taps** their phone against it over NFC or **scans** a QR code — both carry the same [Solana Pay](https://docs.solanapay.com/) transfer-request URL, so either transport lands on the exact same "parse → build transaction → sign" path. Signing goes through the [Mobile Wallet Adapter](https://docs.solanamobile.com/react-native/quickstart) protocol, so it works with whatever Solana wallet is already on the phone (Seed Vault on a Seeker device, or Phantom/Solflare on any Android phone) — no wallet-specific code.
 
-- Solana libraries: `web3.js`, Mobile Wallet Adapter, and `spl-token`.
-- Required polyfills like `crypto` and `Buffer` configured.
-- Pre-built React UI and re-usable hooks and code patterns like `useMobileWallet`.
+Currently running on **devnet** for development and testing.
 
-**This is only fully functional on Android.**
+## Why
 
-<table>
-  <tr>
-    <td align="center">
-      <img src="./screenshots/screenshot1.png" alt="Scaffold dApp Screenshot 1" width=300 />
-    </td>
-    <td align="center">
-      <img src="./screenshots/screenshot2.png" alt="Scaffold dApp Screenshot 2" width=300 />
-    </td>
-    <td align="center">
-      <img src="./screenshots/screenshot3.png" alt="Scaffold dApp Screenshot 3" width=300 />
-    </td>
-  </tr>
-</table>
+Most Solana Pay demos are QR-only. This app treats NFC tap-to-pay (via Android Host Card Emulation) as a first-class transport alongside QR, so it actually exercises the phone's hardware rather than just wrapping a payment link in an app shell — the kind of thing the Solana Mobile hardware track rewards.
 
-## Tech Stack
+## Features
 
-| Library               | Category          | Version | Description                                           |
-| --------------------- | ----------------- | ------- | ----------------------------------------------------- |
-| React Native          | Mobile Framework  | v0.76   | The best cross-platform mobile framework              |
-| Expo                  | SDK               | v52     | Allows (optional) Expo modules                        |
-| React                 | UI Framework      | v18.3   | The most popular UI framework in the world            |
-| Mobile Wallet Adapter | SDK               | v2.1    | Connect and request signing from mobile wallet apps   |
-| Solana web3.js        | SDK               | v1.78   | General Solana library for transactions and RPCs      |
-| spl-token             | SDK               | v0.4    | Library for building with Solana SPL tokens           |
-| React Native Paper    | Component Library | v5.12   | Production-ready components following Material Design |
-| React Navigation      | Navigation        | v6      | Performant and consistent navigation framework        |
-| React Query           | State management  | v5.24   | Async query management                                |
-| TypeScript            | Language          | v5      | Static typechecking                                   |
-| AsyncStorage          | Persistence       | v1.23   | State persistence                                     |
+- **Tap to pay** — the merchant screen broadcasts the payment request over NFC (HCE); the customer's phone reads it just by tapping.
+- **Scan to pay** — every request is also a QR code, so there's always a fallback transport.
+- **Any Solana wallet** — signing goes through Mobile Wallet Adapter, not a bundled wallet.
+- **Live countdowns** — both the merchant's "waiting for payment" screen and the customer's "confirm in your wallet" screen show a real countdown and auto-cancel instead of silently failing once a blockhash expires.
+- **Balance privacy** — a hide/unhide toggle on the balance card, because showing your balance on a POS screen in public isn't always what you want.
 
-## Quick Start
+## Tech stack
 
-### Prerequisites
+| Layer | Choice |
+| --- | --- |
+| Framework | React Native (Expo 52, custom dev client — not Expo Go) |
+| Language | TypeScript, with a thin native Kotlin layer only where Expo can't reach (the NFC HCE service) |
+| Payments | [`@solana/pay`](https://www.npmjs.com/package/@solana/pay), [`@solana/web3.js`](https://www.npmjs.com/package/@solana/web3.js) |
+| Wallet | [Mobile Wallet Adapter](https://github.com/solana-mobile/mobile-wallet-adapter) (wallet-agnostic) |
+| NFC | [`react-native-hce`](https://github.com/appidea/react-native-hce) (merchant broadcast), [`react-native-nfc-manager`](https://github.com/revtel/react-native-nfc-manager) (customer read) |
+| QR | [`react-native-qrcode-svg`](https://github.com/awesomejerry/react-native-qrcode-svg), `expo-camera` |
+| UI | React Native Paper (Material Design 3) |
 
-- A free [Expo](https://expo.dev/) account.
-- An Android device/emulator to test your app
-  - Install an MWA compliant wallet app on your device/emulator.
-- If using Expo's cloud service `eas build`, no further setup is required.
-- If building locally:
-  - React Native and Android Envrionment [setup](https://docs.solanamobile.com/getting-started/development-setup)
+## Running it
 
-### Initialize
+This project builds entirely from the CLI — no Android Studio required.
 
-Run the CLI command:
+**Prerequisites**: Node 22, JDK 17, the Android SDK (`platform-tools`, `build-tools`, NDK), yarn (`corepack enable`), and a physical Android device with an MWA-compatible wallet installed (Phantom, Solflare, or Seed Vault on a Seeker device).
 
-```
-yarn create expo-app --template @solana-mobile/solana-mobile-expo-template
+```bash
+yarn install
+
+# One-time: generate the native android/ project (already committed here —
+# only needed if you're regenerating from scratch)
+npx expo prebuild -p android
+
+# Build and install
+cd android && ./gradlew assembleDebug
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+
+# Start the Metro dev server (from the project root)
+npx expo start --dev-client
+adb reverse tcp:8081 tcp:8081
 ```
 
-Choose your project name then navigate into the directory.
+You'll also need a devnet RPC endpoint — set `EXPO_PUBLIC_HELIUS_DEVNET_API_KEY` in a `.env` file (a free [Helius](https://helius.dev) API key works well; the public `api.devnet.solana.com` endpoint is rate-limited too aggressively for even solo testing).
 
-### Build and run the app
+Full setup notes, gotchas, and current project status live in [AGENTS.md](./AGENTS.md).
 
-Once your app is initialized, follow the **["Running the app"](https://docs.solanamobile.com/react-native/expo#running-the-app)** guide to launch the template as a custom development build.
+## Status
 
-## Troubleshooting
+Built for the Solana Mobile Hackathon (submissions close October 8, 2026). Core wallet connect + devnet signing, the Solana Pay QR flow, and NFC tap-to-pay are all built and smoke-tested on real hardware; see [AGENTS.md](./AGENTS.md) for the detailed, up-to-date build log and what's still outstanding.
 
-- `Metro has encountered an error: While trying to resolve module @solana-mobile/mobile-wallet-adapter-protocol...`
+## License
 
-  - This is an on-going issue when using `npm install` to install the Expo template.
-  - To mitigate, clean your project dependencies and reinstall with `yarn install`
-
-- `The package 'solana-mobile-wallet-adapter-protocol' doesn't seem to be linked. Make sure: ...`
-
-  - Ensure you are _NOT_ using Expo Go to run your app.
-  - You need to be using an [Expo custom development build](https://docs.solanamobile.com/react-native/expo#custom-development-build), rather than Expo Go.
-
-- `failed to connect to...`
-
-  - This is an Expo error that can occur when trying to connect to the dev server on certain Wifi networks.
-  - To fix, try starting the dev server with the `--tunnel` command (`npx expo start --dev-client --tunnel`)
-
-- `Error: crypto.getRandomValues() not supported`
-  - This is a polyfill issue when trying to use certain functions from the `@solana/web3.js` in a React Native/Expo environment.
-  - To fix, ensure your App properly imports and uses the polyfills like in this [guide](http://docs.solanamobile.com/react-native/expo#step-3-update-appjs-with-polyfills).
-
-<br>
-
-- `error Failed to load configuration of your project.`
-  - Same as above, but for `yarn`. [Uninstall and reinstall](https://github.com/react-native-community/cli#updating-the-cli) the CLI through yarn.
-
-<br>
-
-- `Looks like your iOS environment is not properly set`:
-  - You can ignore this during template initialization and build the Android app as normal. This template is only compatible with Android.
-
-<br>
-
-- `Usage Error: It seems you are trying to add a package using a https:... url; we now require package names to be explicitly specified.`
-  - This error happens on certain versions of `yarn`, and occurs if you try to initialize the template through the Github repo URL, rather than the npm package. To avoid this, use the `@solana-mobile/solana-mobile-dapp-scaffold` package as specified, or downgrade your `yarn` version to classic (1.22.x).
-
-<br>
-
-- `error Couldn't find the ".../@solana-mobile/solana-mobile-dapp-scaffold/template.config.js file inside "@solana-mobile/solana-mobile-dapp-scaffold" template.`
-  - This is a [known error](https://github.com/react-native-community/cli/issues/1924) that occurs with certain versions of `yarn` (>= 3.5.0). It is fixed by running the cli command with the `--npm` flag or downgrading your version of `yarn`.
+MIT — see [LICENSE](./LICENSE).
