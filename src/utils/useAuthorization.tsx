@@ -9,6 +9,8 @@ import {
   DeauthorizeAPI,
   SignInPayloadWithRequiredFields,
   SignInPayload,
+  SolanaMobileWalletAdapterProtocolError,
+  SolanaMobileWalletAdapterProtocolErrorCode,
 } from "@solana-mobile/mobile-wallet-adapter-protocol";
 import { toUint8Array } from "js-base64";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -101,6 +103,40 @@ export const APP_IDENTITY = {
   uri: "https://tapwifsol.app",
 };
 
+/**
+ * Some wallets (observed with Phantom) reject a silent reauthorization made
+ * with a previously stored auth_token — ERROR_AUTHORIZATION_FAILED — even
+ * though a fresh authorize() moments earlier succeeded. Per the MWA spec,
+ * auth_token reuse is best-effort, so fall back to a full authorize() (which
+ * re-prompts the wallet's approval UI) rather than surfacing a hard failure.
+ */
+async function authorizeWithFallback(
+  wallet: AuthorizeAPI,
+  authToken: AuthToken | undefined
+): Promise<AuthorizationResult> {
+  if (authToken) {
+    try {
+      return await wallet.authorize({
+        identity: APP_IDENTITY,
+        chain: CHAIN_IDENTIFIER,
+        auth_token: authToken,
+      });
+    } catch (error) {
+      const isAuthFailure =
+        error instanceof SolanaMobileWalletAdapterProtocolError &&
+        error.code ===
+          SolanaMobileWalletAdapterProtocolErrorCode.ERROR_AUTHORIZATION_FAILED;
+      if (!isAuthFailure) {
+        throw error;
+      }
+    }
+  }
+  return await wallet.authorize({
+    identity: APP_IDENTITY,
+    chain: CHAIN_IDENTIFIER,
+  });
+}
+
 export function useAuthorization() {
   const queryClient = useQueryClient();
   const { data: authorization, isLoading } = useQuery({
@@ -129,11 +165,10 @@ export function useAuthorization() {
   );
   const authorizeSession = useCallback(
     async (wallet: AuthorizeAPI) => {
-      const authorizationResult = await wallet.authorize({
-        identity: APP_IDENTITY,
-        chain: CHAIN_IDENTIFIER,
-        auth_token: authorization?.authToken,
-      });
+      const authorizationResult = await authorizeWithFallback(
+        wallet,
+        authorization?.authToken
+      );
       return (await handleAuthorizationResult(authorizationResult))
         .selectedAccount;
     },

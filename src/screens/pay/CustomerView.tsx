@@ -19,6 +19,13 @@ type Status = "scanning" | "processing" | "sent";
 // instead of quietly dying to "Transaction expired" from the wallet later.
 const SIGN_TIMEOUT_SECONDS = 60;
 
+// A failed attempt resets status to "scanning", which immediately re-arms
+// the NFC listener — if the phones are still touching from the same tap,
+// the tag gets rediscovered instantly and re-fires with the identical URL
+// before the user did anything. Refuse to re-attempt the same URL within
+// this window so one physical tap can't stack two wallet launches.
+const RETRY_COOLDOWN_MS = 3000;
+
 export function CustomerView({ payer }: { payer: PublicKey }) {
   const { connection } = useConnection();
   const wallet = useMobileWallet();
@@ -32,10 +39,21 @@ export function CustomerView({ payer }: { payer: PublicKey }) {
   // Guards a payment attempt in flight so a timeout can make the UI move on
   // (back to "scanning") without a late wallet response clobbering it.
   const cancelTokenRef = useRef<{ cancelled: boolean } | null>(null);
+  const lastFailedRef = useRef<{ url: string; until: number } | null>(null);
+  const currentUrlRef = useRef<string | null>(null);
 
   const processPaymentUrl = useCallback(
     async (urlString: string) => {
       if (statusRef.current !== "scanning") return;
+      const lastFailed = lastFailedRef.current;
+      if (
+        lastFailed &&
+        lastFailed.url === urlString &&
+        Date.now() < lastFailed.until
+      ) {
+        return;
+      }
+      currentUrlRef.current = urlString;
       const token = { cancelled: false };
       cancelTokenRef.current = token;
       setStatus("processing");
@@ -60,6 +78,10 @@ export function CustomerView({ payer }: { payer: PublicKey }) {
         setStatus("sent");
       } catch (error: any) {
         if (token.cancelled) return;
+        lastFailedRef.current = {
+          url: urlString,
+          until: Date.now() + RETRY_COOLDOWN_MS,
+        };
         alertAndLog("Payment failed", String(error?.message ?? error));
         setStatus("scanning");
       }
@@ -69,6 +91,12 @@ export function CustomerView({ payer }: { payer: PublicKey }) {
 
   const handleSignTimeout = useCallback(() => {
     if (cancelTokenRef.current) cancelTokenRef.current.cancelled = true;
+    if (currentUrlRef.current) {
+      lastFailedRef.current = {
+        url: currentUrlRef.current,
+        until: Date.now() + RETRY_COOLDOWN_MS,
+      };
+    }
     alertAndLog(
       "Transaction expired",
       "You took too long to approve in your wallet, so this request timed out. Scan or tap again to retry."
@@ -156,13 +184,15 @@ export function CustomerView({ payer }: { payer: PublicKey }) {
 
   return (
     <View style={styles.cameraContainer}>
-      <CameraView
-        style={StyleSheet.absoluteFillObject}
-        barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
-        onBarcodeScanned={status === "scanning" ? handleScan : undefined}
-      />
       {status === "scanning" && (
-        <View pointerEvents="none" style={styles.viewfinder} />
+        <>
+          <CameraView
+            style={StyleSheet.absoluteFillObject}
+            barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+            onBarcodeScanned={handleScan}
+          />
+          <View pointerEvents="none" style={styles.viewfinder} />
+        </>
       )}
       <View style={styles.overlay}>
         <Text style={styles.overlayText}>
@@ -196,6 +226,7 @@ const styles = StyleSheet.create({
   cameraContainer: {
     flex: 1,
     minHeight: 400,
+    backgroundColor: "black",
   },
   overlay: {
     position: "absolute",
