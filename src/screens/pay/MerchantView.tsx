@@ -22,6 +22,7 @@ import {
 } from "../../solana/solanaPay";
 import { broadcastPaymentUrl, stopBroadcast } from "../../nfc/hceBroadcast";
 import { useCountdown, formatCountdown } from "../../hooks/useCountdown";
+import { addHistoryEntry } from "../../utils/transactionHistory";
 
 type Status = "idle" | "waiting" | "paid" | "timedOut";
 
@@ -91,6 +92,12 @@ export function MerchantView({ recipient }: { recipient: PublicKey }) {
       .then((sig) => {
         setSignature(sig);
         setStatus("paid");
+        addHistoryEntry({
+          signature: sig,
+          direction: "received",
+          amountSol: amount,
+          counterparty: null,
+        }).catch(() => {});
       })
       .catch((error) => {
         if (controller.signal.aborted) return;

@@ -4,8 +4,8 @@ import { TopBar } from "../components/top-bar/top-bar-feature";
 import { HomeScreen } from "../screens/HomeScreen";
 import MaterialCommunityIcon from "@expo/vector-icons/MaterialCommunityIcons";
 import { useTheme } from "react-native-paper";
-import BlankScreen from "../screens/BlankScreen";
 import { PayScreen } from "../screens/pay/PayScreen";
+import { HistoryScreen } from "../screens/pay/HistoryScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -39,15 +39,9 @@ export function HomeNavigator() {
                   color={color}
                 />
               );
-            case "Blank":
+            case "History":
               return (
-                <MaterialCommunityIcon
-                  name={
-                    focused ? "application-edit" : "application-edit-outline"
-                  }
-                  size={size}
-                  color={color}
-                />
+                <MaterialCommunityIcon name="history" size={size} color={color} />
               );
           }
         },
@@ -55,7 +49,7 @@ export function HomeNavigator() {
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Pay" component={PayScreen} />
-      <Tab.Screen name="Blank" component={BlankScreen} />
+      <Tab.Screen name="History" component={HistoryScreen} />
     </Tab.Navigator>
   );
 }

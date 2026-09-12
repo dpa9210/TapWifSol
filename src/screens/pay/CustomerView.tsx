@@ -11,6 +11,7 @@ import { alertAndLog } from "../../utils/alertAndLog";
 import { buildPaymentTransaction, parsePaymentURL } from "../../solana/solanaPay";
 import { cancelNfcRead, readOneNfcUrl } from "../../nfc/nfcReader";
 import { useCountdown, formatCountdown } from "../../hooks/useCountdown";
+import { addHistoryEntry } from "../../utils/transactionHistory";
 
 type Status = "scanning" | "processing" | "sent";
 
@@ -76,6 +77,12 @@ export function CustomerView({ payer }: { payer: PublicKey }) {
         if (token.cancelled) return;
         setSignature(sig);
         setStatus("sent");
+        addHistoryEntry({
+          signature: sig,
+          direction: "sent",
+          amountSol: fields.amount.toString(),
+          counterparty: fields.recipient.toBase58(),
+        }).catch(() => {});
       } catch (error: any) {
         if (token.cancelled) return;
         lastFailedRef.current = {
