@@ -1,11 +1,12 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Avatar, Text, useTheme } from "react-native-paper";
+import { Text, useTheme } from "react-native-paper";
 
 import { Section } from "../Section";
 import { useAuthorization } from "../utils/useAuthorization";
 import { AccountDetailFeature } from "../components/account/account-detail-feature";
 import { SignInFeature } from "../components/sign-in/sign-in-feature";
+import { BrandIcon } from "../components/BrandIcon";
 import { BRAND_FONT_EXTRABOLD } from "../hooks/useBrandFonts";
 
 export function HomeScreen() {
@@ -15,12 +16,7 @@ export function HomeScreen() {
   return (
     <View style={styles.screenContainer}>
       <View style={styles.brandRow}>
-        <Avatar.Icon
-          icon="cellphone-nfc"
-          size={44}
-          style={{ backgroundColor: theme.colors.primaryContainer }}
-          color={theme.colors.onPrimaryContainer}
-        />
+        <BrandIcon />
         <View style={styles.brandText}>
           <Text style={styles.title} variant="headlineMedium">
             TapWifSol

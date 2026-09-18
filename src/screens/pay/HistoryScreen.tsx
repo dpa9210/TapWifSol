@@ -6,7 +6,7 @@ import MaterialCommunityIcon from "@expo/vector-icons/MaterialCommunityIcons";
 import * as Clipboard from "expo-clipboard";
 
 import { getHistory, HistoryEntry } from "../../utils/transactionHistory";
-import { DANGER_CORAL } from "../../theme";
+import { DANGER_CORAL, SUCCESS_GREEN } from "../../theme";
 
 function shortenKey(key: string): string {
   return `${key.slice(0, 4)}…${key.slice(-4)}`;
@@ -29,10 +29,10 @@ function HistoryRow({ item }: { item: HistoryEntry }) {
   const theme = useTheme();
   const [copied, setCopied] = useState(false);
 
-  const amountColor = isSent ? DANGER_CORAL : theme.colors.secondary;
+  const amountColor = isSent ? DANGER_CORAL : SUCCESS_GREEN;
   const iconBg = isSent
     ? "rgba(255, 138, 112, 0.16)"
-    : theme.colors.secondaryContainer;
+    : "rgba(63, 206, 147, 0.16)";
 
   const copyAddress = useCallback(() => {
     if (!item.counterparty) return;

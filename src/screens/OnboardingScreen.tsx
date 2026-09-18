@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Avatar, Button, Text, useTheme } from "react-native-paper";
 import MaterialCommunityIcon from "@expo/vector-icons/MaterialCommunityIcons";
+import { BrandIcon } from "../components/BrandIcon";
 import { BRAND_FONT_EXTRABOLD } from "../hooks/useBrandFonts";
 
 type Slide = {
@@ -45,12 +46,16 @@ export function OnboardingScreen({ onDone }: { onDone: () => void }) {
       </View>
 
       <View style={styles.content}>
-        <Avatar.Icon
-          icon={slide.icon}
-          size={88}
-          style={{ backgroundColor: theme.colors.primaryContainer }}
-          color={theme.colors.onPrimaryContainer}
-        />
+        {index === 0 ? (
+          <BrandIcon size={88} />
+        ) : (
+          <Avatar.Icon
+            icon={slide.icon}
+            size={88}
+            style={{ backgroundColor: theme.colors.primaryContainer }}
+            color={theme.colors.onPrimaryContainer}
+          />
+        )}
         <Text
           variant="headlineMedium"
           style={[styles.title, { color: theme.colors.onSurface }]}

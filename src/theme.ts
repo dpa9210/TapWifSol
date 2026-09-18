@@ -34,10 +34,16 @@ const darkColors = {
   onPrimary: "#3D2C0A",
   primaryContainer: "#3D2C0A",
   onPrimaryContainer: "#FFE8B8",
-  secondary: SUCCESS_GREEN,
-  onSecondary: "#04241A",
-  secondaryContainer: "#123423",
-  onSecondaryContainer: "#B8F5DA",
+  // Deliberately mirrors primary, not green: react-native-paper's "selected"
+  // and "tonal" states (SegmentedButtons, Chip, etc.) default to this token
+  // for ANY unstyled instance — leaving it green meant every new toggle
+  // silently turned green until individually overridden (see git history).
+  // Actual success/received color lives in SUCCESS_GREEN, applied explicitly
+  // only at the few deliberate "payment succeeded" call sites.
+  secondary: AMBER,
+  onSecondary: "#3D2C0A",
+  secondaryContainer: "#3D2C0A",
+  onSecondaryContainer: "#FFE8B8",
 };
 
 const lightColors = {
@@ -52,10 +58,11 @@ const lightColors = {
   onPrimary: "#FFFFFF",
   primaryContainer: "#FFE3B3",
   onPrimaryContainer: "#2B1900",
-  secondary: "#1F8F5F",
+  // See dark theme's comment — mirrors primary on purpose.
+  secondary: "#8A5300",
   onSecondary: "#FFFFFF",
-  secondaryContainer: "#C3F5DE",
-  onSecondaryContainer: "#002010",
+  secondaryContainer: "#FFE3B3",
+  onSecondaryContainer: "#2B1900",
 };
 
 export const TapWifSolDarkTheme: MD3Theme = {

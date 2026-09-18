@@ -1,7 +1,8 @@
 import React from "react";
 import { Linking, ScrollView, StyleSheet, View } from "react-native";
-import { Avatar, Divider, List, Text, useTheme } from "react-native-paper";
+import { Divider, List, Text, useTheme } from "react-native-paper";
 import MaterialCommunityIcon from "@expo/vector-icons/MaterialCommunityIcons";
+import { BrandIcon } from "../components/BrandIcon";
 import { BRAND_FONT_EXTRABOLD } from "../hooks/useBrandFonts";
 
 const HOW_IT_WORKS: {
@@ -40,12 +41,7 @@ export function AboutScreen() {
       contentContainerStyle={styles.container}
     >
       <View style={styles.brandRow}>
-        <Avatar.Icon
-          icon="cellphone-nfc"
-          size={56}
-          style={{ backgroundColor: theme.colors.primaryContainer }}
-          color={theme.colors.onPrimaryContainer}
-        />
+        <BrandIcon size={56} />
         <View style={styles.brandText}>
           <Text variant="headlineSmall" style={styles.title}>
             TapWifSol

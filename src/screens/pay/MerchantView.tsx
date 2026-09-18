@@ -8,7 +8,6 @@ import {
   Surface,
   Text,
   TextInput,
-  useTheme,
 } from "react-native-paper";
 import QRCode from "react-native-qrcode-svg";
 import { PublicKey } from "@solana/web3.js";
@@ -20,6 +19,7 @@ import {
   PaymentRequest,
   waitForPayment,
 } from "../../solana/solanaPay";
+import { SUCCESS_GREEN } from "../../theme";
 import { broadcastPaymentUrl, stopBroadcast } from "../../nfc/hceBroadcast";
 import { useCountdown, formatCountdown } from "../../hooks/useCountdown";
 import { addHistoryEntry } from "../../utils/transactionHistory";
@@ -33,7 +33,6 @@ const QUICK_AMOUNTS = ["0.01", "0.05", "0.1", "0.5"];
 
 export function MerchantView({ recipient }: { recipient: PublicKey }) {
   const { connection } = useConnection();
-  const theme = useTheme();
   const [amount, setAmount] = useState("0.01");
   const [request, setRequest] = useState<PaymentRequest | null>(null);
   const [status, setStatus] = useState<Status>("idle");
@@ -159,7 +158,7 @@ export function MerchantView({ recipient }: { recipient: PublicKey }) {
             <Avatar.Icon
               icon="check-circle"
               size={56}
-              style={{ backgroundColor: theme.colors.secondary }}
+              style={{ backgroundColor: SUCCESS_GREEN }}
             />
             <Text
               variant="titleMedium"
