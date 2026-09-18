@@ -42,6 +42,9 @@ yarn-error.*
 .env
 .env*.local
 
+# devnet keypair for the one-time receipt-tree setup script (scripts/createReceiptTree.ts)
+.receipt-tree-authority.json
+
 # Claude Code runtime state (session locks etc.) — not project content
 .claude/*.lock
 

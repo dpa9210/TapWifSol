@@ -1,0 +1,16 @@
+{
+  "name": "TapWifSol Payment Receipt",
+  "symbol": "TWSRCPT",
+  "description": "A proof-of-payment receipt minted by TapWifSol, a tap-to-pay app for Solana Mobile.",
+  "image": "https://raw.githubusercontent.com/dpa9210/TapWifSol/main/assets/icon.png",
+  "attributes": [],
+  "properties": {
+    "category": "image",
+    "files": [
+      {
+        "uri": "https://raw.githubusercontent.com/dpa9210/TapWifSol/main/assets/icon.png",
+        "type": "image/png"
+      }
+    ]
+  }
+}

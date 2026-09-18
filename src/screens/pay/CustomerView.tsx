@@ -9,6 +9,7 @@ import { useConnection } from "../../utils/ConnectionProvider";
 import { useMobileWallet } from "../../utils/useMobileWallet";
 import { alertAndLog } from "../../utils/alertAndLog";
 import { buildPaymentTransaction, parsePaymentURL } from "../../solana/solanaPay";
+import { buildReceiptMintInstruction } from "../../solana/receiptMint";
 import { cancelNfcRead, readOneNfcUrl } from "../../nfc/nfcReader";
 import { useCountdown, formatCountdown } from "../../hooks/useCountdown";
 import { addHistoryEntry } from "../../utils/transactionHistory";
@@ -68,6 +69,21 @@ export function CustomerView({ payer }: { payer: PublicKey }) {
           payer,
           fields
         );
+        // Best-effort: fold a payment-receipt cNFT mint into the same
+        // transaction so it's covered by the one MWA signature. A failure
+        // here (e.g. tree/network hiccup) should never block the actual
+        // payment, so it's non-fatal — the transfer just goes out alone.
+        try {
+          transaction.add(
+            buildReceiptMintInstruction(
+              connection.rpcEndpoint,
+              payer,
+              fields.amount.toString()
+            )
+          );
+        } catch (mintError) {
+          console.warn("Skipping receipt mint:", mintError);
+        }
         const sig = await wallet.signAndSendTransaction(
           transaction,
           minContextSlot
