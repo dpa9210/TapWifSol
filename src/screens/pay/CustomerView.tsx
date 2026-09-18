@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Linking, StyleSheet, View } from "react-native";
-import { Avatar, Button, ProgressBar, Text } from "react-native-paper";
+import { Avatar, Button, Chip, ProgressBar, Text } from "react-native-paper";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { PublicKey } from "@solana/web3.js";
 import type { BarcodeScanningResult } from "expo-camera";
@@ -10,6 +10,7 @@ import { useMobileWallet } from "../../utils/useMobileWallet";
 import { alertAndLog } from "../../utils/alertAndLog";
 import { buildPaymentTransaction, parsePaymentURL } from "../../solana/solanaPay";
 import { buildReceiptMintInstruction } from "../../solana/receiptMint";
+import { isSkrHolder } from "../../solana/skrHolder";
 import { cancelNfcRead, readOneNfcUrl } from "../../nfc/nfcReader";
 import { useCountdown, formatCountdown } from "../../hooks/useCountdown";
 import { addHistoryEntry } from "../../utils/transactionHistory";
@@ -34,6 +35,12 @@ export function CustomerView({ payer }: { payer: PublicKey }) {
   const [permission, requestPermission] = useCameraPermissions();
   const [status, setStatus] = useState<Status>("scanning");
   const [signature, setSignature] = useState<string | null>(null);
+  // One-off read-only mainnet check (see skrHolder.ts) — never blocks the
+  // payment; simply unlocks a cosmetic badge + upgraded receipt tier.
+  const [isHolder, setIsHolder] = useState(false);
+  useEffect(() => {
+    isSkrHolder(payer).then(setIsHolder);
+  }, [payer]);
   // Read via a ref too, so the NFC effect (which only runs once) always
   // checks the *current* status rather than the value from when it started.
   const statusRef = useRef(status);
@@ -78,7 +85,8 @@ export function CustomerView({ payer }: { payer: PublicKey }) {
             buildReceiptMintInstruction(
               connection.rpcEndpoint,
               payer,
-              fields.amount.toString()
+              fields.amount.toString(),
+              isHolder
             )
           );
         } catch (mintError) {
@@ -189,6 +197,16 @@ export function CustomerView({ payer }: { payer: PublicKey }) {
         <Text variant="titleMedium" style={[styles.centerText, styles.success]}>
           Payment sent!
         </Text>
+        {isHolder && (
+          <Chip
+            icon="star-circle"
+            style={styles.holderChip}
+            textStyle={styles.holderChipText}
+            compact
+          >
+            SKR Holder receipt minted
+          </Chip>
+        )}
         <Button
           mode="text"
           compact
@@ -215,6 +233,16 @@ export function CustomerView({ payer }: { payer: PublicKey }) {
             onBarcodeScanned={handleScan}
           />
           <View pointerEvents="none" style={styles.viewfinder} />
+          {isHolder && (
+            <Chip
+              icon="star-circle"
+              style={styles.holderBadge}
+              textStyle={styles.holderChipText}
+              compact
+            >
+              SKR Holder
+            </Chip>
+          )}
         </>
       )}
       <View style={styles.overlay}>
@@ -296,5 +324,18 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 8,
+  },
+  holderChip: {
+    marginTop: 8,
+    backgroundColor: "#9945FF",
+  },
+  holderBadge: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    backgroundColor: "#9945FF",
+  },
+  holderChipText: {
+    color: "white",
   },
 });

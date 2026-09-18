@@ -26,11 +26,20 @@ export const RECEIPT_METADATA_URI =
 export function buildReceiptMintInstruction(
   rpcEndpoint: string,
   payer: PublicKey,
-  amountSol: string
+  amountSol: string,
+  isSkrHolder: boolean = false
 ): TransactionInstruction {
   const umi = createUmi(rpcEndpoint).use(mplBubblegum());
   const payerUmiKey = fromWeb3JsPublicKey(payer);
   const noop = createNoopSigner(payerUmiKey);
+
+  // The metadata JSON/image is one static file shared by every receipt —
+  // the "SKR Holder" tier is expressed purely through this per-mint name,
+  // since a public tree + static metadata can't otherwise carry a
+  // per-payment attribute.
+  const name = isSkrHolder
+    ? `TapWifSol Receipt — ${amountSol} SOL (SKR Holder)`
+    : `TapWifSol Receipt — ${amountSol} SOL`;
 
   const builder = mintV1(umi, {
     leafOwner: payerUmiKey,
@@ -38,7 +47,7 @@ export function buildReceiptMintInstruction(
     payer: noop,
     treeCreatorOrDelegate: noop,
     metadata: {
-      name: `TapWifSol Receipt — ${amountSol} SOL`,
+      name,
       symbol: "TWSRCPT",
       uri: RECEIPT_METADATA_URI,
       sellerFeeBasisPoints: 0,
