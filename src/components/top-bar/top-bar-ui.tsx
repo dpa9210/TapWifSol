@@ -1,7 +1,6 @@
-import { Button, IconButton, Menu, useTheme } from "react-native-paper";
+import { Button, Menu, useTheme } from "react-native-paper";
 import { Account, useAuthorization } from "../../utils/useAuthorization";
 import { useMobileWallet } from "../../utils/useMobileWallet";
-import { useNavigation } from "@react-navigation/native";
 import { ellipsify } from "../../utils/ellipsify";
 import { useState } from "react";
 import * as Clipboard from "expo-clipboard";
@@ -16,30 +15,20 @@ export function TopBarWalletButton({
   openMenu: () => void;
 }) {
   const { connect } = useMobileWallet();
+  const theme = useTheme();
   return (
     <Button
       icon="wallet"
       mode="contained-tonal"
       style={{ alignSelf: "center" }}
+      buttonColor={theme.colors.surfaceVariant}
+      textColor={theme.colors.onSurfaceVariant}
       onPress={selectedAccount ? openMenu : connect}
     >
       {selectedAccount
         ? ellipsify(selectedAccount.publicKey.toBase58())
         : "Connect"}
     </Button>
-  );
-}
-
-export function TopBarSettingsButton() {
-  const navigation = useNavigation();
-  return (
-    <IconButton
-      icon="cog"
-      mode="contained-tonal"
-      onPress={() => {
-        navigation.navigate("Settings");
-      }}
-    />
   );
 }
 

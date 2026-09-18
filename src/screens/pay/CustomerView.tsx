@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Linking, StyleSheet, View } from "react-native";
-import { Avatar, Button, Chip, ProgressBar, Text } from "react-native-paper";
+import { Avatar, Button, Chip, ProgressBar, Text, useTheme } from "react-native-paper";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { PublicKey } from "@solana/web3.js";
 import type { BarcodeScanningResult } from "expo-camera";
@@ -11,6 +11,7 @@ import { alertAndLog } from "../../utils/alertAndLog";
 import { buildPaymentTransaction, parsePaymentURL } from "../../solana/solanaPay";
 import { buildReceiptMintInstruction } from "../../solana/receiptMint";
 import { isSkrHolder } from "../../solana/skrHolder";
+import { HOLDER_TEAL } from "../../theme";
 import { cancelNfcRead, readOneNfcUrl } from "../../nfc/nfcReader";
 import { useCountdown, formatCountdown } from "../../hooks/useCountdown";
 import { addHistoryEntry } from "../../utils/transactionHistory";
@@ -32,6 +33,7 @@ const RETRY_COOLDOWN_MS = 3000;
 export function CustomerView({ payer }: { payer: PublicKey }) {
   const { connection } = useConnection();
   const wallet = useMobileWallet();
+  const theme = useTheme();
   const [permission, requestPermission] = useCameraPermissions();
   const [status, setStatus] = useState<Status>("scanning");
   const [signature, setSignature] = useState<string | null>(null);
@@ -193,7 +195,11 @@ export function CustomerView({ payer }: { payer: PublicKey }) {
   if (status === "sent") {
     return (
       <View style={styles.container}>
-        <Avatar.Icon icon="check-circle" size={64} style={styles.successIcon} />
+        <Avatar.Icon
+          icon="check-circle"
+          size={64}
+          style={[styles.successIcon, { backgroundColor: theme.colors.secondary }]}
+        />
         <Text variant="titleMedium" style={[styles.centerText, styles.success]}>
           Payment sent!
         </Text>
@@ -319,7 +325,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   successIcon: {
-    backgroundColor: "#14F195",
     marginBottom: 8,
   },
   button: {
@@ -327,13 +332,13 @@ const styles = StyleSheet.create({
   },
   holderChip: {
     marginTop: 8,
-    backgroundColor: "#9945FF",
+    backgroundColor: HOLDER_TEAL,
   },
   holderBadge: {
     position: "absolute",
     top: 16,
     right: 16,
-    backgroundColor: "#9945FF",
+    backgroundColor: HOLDER_TEAL,
   },
   holderChipText: {
     color: "white",

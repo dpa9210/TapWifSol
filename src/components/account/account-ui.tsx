@@ -3,7 +3,6 @@ import {
   useGetBalance,
   useGetTokenAccountBalance,
   useGetTokenAccounts,
-  useRequestAirdrop,
   useTransferSol,
 } from "./account-data-access";
 import { View, StyleSheet, ScrollView } from "react-native";
@@ -86,19 +85,13 @@ export function AccountBalance({ address }: { address: PublicKey }) {
 }
 
 export function AccountButtonGroup({ address }: { address: PublicKey }) {
-  const requestAirdrop = useRequestAirdrop({ address });
-  const [showAirdropModal, setShowAirdropModal] = useState(false);
   const [showReceiveModal, setShowReceiveModal] = useState(false);
   const [showSendModal, setShowSendModal] = useState(false);
+  const theme = useTheme();
 
   return (
     <>
       <View style={styles.accountButtonGroup}>
-        <AirdropRequestModal
-          hide={() => setShowAirdropModal(false)}
-          show={showAirdropModal}
-          address={address}
-        />
         <TransferSolModal
           hide={() => setShowSendModal(false)}
           show={showSendModal}
@@ -111,20 +104,11 @@ export function AccountButtonGroup({ address }: { address: PublicKey }) {
         />
         <Button
           mode="contained-tonal"
-          icon="water"
-          disabled={requestAirdrop.isPending}
-          onPress={() => {
-            setShowAirdropModal(true);
-          }}
-          style={styles.groupButton}
-        >
-          Airdrop
-        </Button>
-        <Button
-          mode="contained-tonal"
           icon="arrow-up-bold"
           onPress={() => setShowSendModal(true)}
           style={styles.groupButton}
+          buttonColor={theme.colors.primaryContainer}
+          textColor={theme.colors.onPrimaryContainer}
         >
           Send
         </Button>
@@ -133,42 +117,13 @@ export function AccountButtonGroup({ address }: { address: PublicKey }) {
           icon="arrow-down-bold"
           onPress={() => setShowReceiveModal(true)}
           style={styles.groupButton}
+          buttonColor={theme.colors.primaryContainer}
+          textColor={theme.colors.onPrimaryContainer}
         >
           Receive
         </Button>
       </View>
     </>
-  );
-}
-
-export function AirdropRequestModal({
-  hide,
-  show,
-  address,
-}: {
-  hide: () => void;
-  show: boolean;
-  address: PublicKey;
-}) {
-  const requestAirdrop = useRequestAirdrop({ address });
-
-  return (
-    <AppModal
-      title="Request Airdrop"
-      hide={hide}
-      show={show}
-      submit={() => {
-        requestAirdrop.mutateAsync(1).catch((err) => console.log(err));
-      }}
-      submitLabel="Request"
-      submitDisabled={requestAirdrop.isPending}
-    >
-      <View style={{ padding: 4 }}>
-        <Text>
-          Request an airdrop of 1 SOL to your connected wallet account.
-        </Text>
-      </View>
-    </AppModal>
   );
 }
 

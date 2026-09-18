@@ -15,7 +15,7 @@ export function HomeScreen() {
     <View style={styles.screenContainer}>
       <View style={styles.brandRow}>
         <Avatar.Icon
-          icon="contactless-payment"
+          icon="cellphone-nfc"
           size={44}
           style={{ backgroundColor: theme.colors.primaryContainer }}
           color={theme.colors.onPrimaryContainer}
