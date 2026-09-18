@@ -1,5 +1,6 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from "react";
+import { StyleSheet, View } from "react-native";
 import { TopBar } from "../components/top-bar/top-bar-feature";
 import { HomeScreen } from "../screens/HomeScreen";
 import MaterialCommunityIcon from "@expo/vector-icons/MaterialCommunityIcons";
@@ -8,6 +9,21 @@ import { PayScreen } from "../screens/pay/PayScreen";
 import { HistoryScreen } from "../screens/pay/HistoryScreen";
 
 const Tab = createBottomTabNavigator();
+
+type IconName = React.ComponentProps<typeof MaterialCommunityIcon>["name"];
+
+function tabIconName(routeName: string, focused: boolean): IconName {
+  switch (routeName) {
+    case "Home":
+      return focused ? "home" : "home-outline";
+    case "Pay":
+      return focused ? "qrcode-scan" : "qrcode";
+    case "History":
+      return focused ? "history" : "history";
+    default:
+      return "circle";
+  }
+}
 
 /**
  * This is the main navigator with a bottom tab bar.
@@ -21,30 +37,33 @@ export function HomeNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         header: () => <TopBar />,
-        tabBarIcon: ({ focused, color, size }) => {
-          switch (route.name) {
-            case "Home":
-              return (
-                <MaterialCommunityIcon
-                  name={focused ? "home" : "home-outline"}
-                  size={size}
-                  color={color}
-                />
-              );
-            case "Pay":
-              return (
-                <MaterialCommunityIcon
-                  name={focused ? "qrcode-scan" : "qrcode"}
-                  size={size}
-                  color={color}
-                />
-              );
-            case "History":
-              return (
-                <MaterialCommunityIcon name="history" size={size} color={color} />
-              );
-          }
+        tabBarStyle: {
+          height: 72,
+          paddingTop: 10,
+          paddingBottom: 14,
+          borderTopWidth: 1,
+          borderTopColor: theme.colors.outlineVariant,
         },
+        // A bordered "pill" per icon, filled solid on the active tab —
+        // gives the bar some visual weight instead of bare glyphs sitting
+        // flush against the bar's edge.
+        tabBarIcon: ({ focused, color, size }) => (
+          <View
+            style={[
+              styles.iconPill,
+              {
+                borderColor: focused ? color : theme.colors.outlineVariant,
+                backgroundColor: focused ? color : "transparent",
+              },
+            ]}
+          >
+            <MaterialCommunityIcon
+              name={tabIconName(route.name, focused)}
+              size={size - 4}
+              color={focused ? theme.colors.surface : color}
+            />
+          </View>
+        ),
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
@@ -53,3 +72,14 @@ export function HomeNavigator() {
     </Tab.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  iconPill: {
+    width: 46,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});

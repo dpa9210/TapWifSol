@@ -1,4 +1,9 @@
-import NfcManager, { Ndef, NfcEvents, type TagEvent } from "react-native-nfc-manager";
+import NfcManager, {
+  Ndef,
+  NfcAdapter,
+  NfcEvents,
+  type TagEvent,
+} from "react-native-nfc-manager";
 
 let started = false;
 
@@ -51,7 +56,15 @@ export async function readOneNfcUrl(): Promise<string> {
         reject(new Error("That tag didn't contain a payment link"));
       }
     });
-    NfcManager.registerTagEvent({ isReaderModeEnabled: true }).catch((error) => {
+    NfcManager.registerTagEvent({
+      isReaderModeEnabled: true,
+      // Reader mode defaults to requesting zero NFC technologies
+      // (readerModeFlags: 0) unless told otherwise, which makes Android's
+      // enableReaderMode a silent no-op — logs "Reader mode Binder was
+      // never registered" and never actually polls for a tag. HCE Type-4
+      // tags (what the merchant broadcasts) show up over NFC-A.
+      readerModeFlags: NfcAdapter.FLAG_READER_NFC_A,
+    }).catch((error) => {
       cleanup();
       reject(error);
     });

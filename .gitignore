@@ -28,6 +28,7 @@ android/app/.cxx/
 
 # Metro
 .metro-health-check*
+metro.log
 
 # debug
 npm-debug.*

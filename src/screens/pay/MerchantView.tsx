@@ -116,20 +116,24 @@ export function MerchantView({ recipient }: { recipient: PublicKey }) {
   if (request) {
     return (
       <View style={styles.container}>
-        <Surface style={styles.qrWrap} elevation={3}>
-          <QRCode value={request.url.toString()} size={240} />
-        </Surface>
-        <Text variant="titleMedium" style={styles.centerText}>
-          Requesting {amount} SOL
-        </Text>
-        <Chip
-          icon={nfcBroadcasting ? "wifi" : "qrcode-scan"}
-          style={styles.transportChip}
-        >
-          {nfcBroadcasting
-            ? "Scan the QR or tap phones together"
-            : "Scan the QR to pay"}
-        </Chip>
+        {status !== "paid" && (
+          <>
+            <Surface style={styles.qrWrap} elevation={3}>
+              <QRCode value={request.url.toString()} size={240} />
+            </Surface>
+            <Text variant="titleMedium" style={styles.centerText}>
+              Requesting {amount} SOL
+            </Text>
+            <Chip
+              icon={nfcBroadcasting ? "wifi" : "qrcode-scan"}
+              style={styles.transportChip}
+            >
+              {nfcBroadcasting
+                ? "Scan the QR or tap phones together"
+                : "Scan the QR to pay"}
+            </Chip>
+          </>
+        )}
 
         {status === "waiting" && (
           <View style={styles.statusBlock}>
