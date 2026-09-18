@@ -1,6 +1,7 @@
 import ClusterPickerFeature from "../components/cluster/cluster-picker-feature";
 import { StyleSheet, View } from "react-native";
-import { SegmentedButtons, Text } from "react-native-paper";
+import { List, SegmentedButtons, Text } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native";
 
 import { useThemePreference } from "../utils/ThemePreferenceProvider";
 
@@ -25,11 +26,21 @@ function AppearancePicker() {
 }
 
 export function SettingsScreen() {
+  const navigation = useNavigation();
+
   return (
     <>
       <View style={styles.screenContainer}>
         <AppearancePicker />
         <ClusterPickerFeature />
+        <View style={styles.aboutRow}>
+          <List.Item
+            title="About TapWifSol"
+            left={(props) => <List.Icon {...props} icon="information-outline" />}
+            right={(props) => <List.Icon {...props} icon="chevron-right" />}
+            onPress={() => navigation.navigate("About")}
+          />
+        </View>
       </View>
     </>
   );
@@ -46,5 +57,9 @@ const styles = StyleSheet.create({
   },
   segmented: {
     marginTop: 12,
+  },
+  aboutRow: {
+    marginTop: 8,
+    marginHorizontal: -16,
   },
 });

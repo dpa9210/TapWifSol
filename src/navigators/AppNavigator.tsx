@@ -4,7 +4,10 @@
  */
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTheme } from "react-native-paper";
 import * as Screens from "../screens";
 import { HomeNavigator } from "./HomeNavigator";
 import { StatusBar } from "expo-status-bar";
@@ -13,6 +16,8 @@ import {
   TapWifSolNavigationDarkTheme,
   TapWifSolNavigationLightTheme,
 } from "../theme";
+
+const ONBOARDING_SEEN_KEY = "tapwifsol.onboardingSeen";
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -30,6 +35,7 @@ import {
 type RootStackParamList = {
   Home: undefined;
   Settings: undefined;
+  About: undefined;
   // 🔥 Your screens go here
 };
 
@@ -51,6 +57,11 @@ const AppStack = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="Settings" component={Screens.SettingsScreen} />
+      <Stack.Screen
+        name="About"
+        component={Screens.AboutScreen}
+        options={{ title: "About" }}
+      />
       {/** 🔥 Your screens go here */}
     </Stack.Navigator>
   );
@@ -61,6 +72,34 @@ export interface NavigationProps
 
 export const AppNavigator = (props: NavigationProps) => {
   const { resolvedScheme } = useThemePreference();
+  const theme = useTheme();
+  // null = still checking AsyncStorage; render nothing rather than flash
+  // the onboarding screen for a returning user.
+  const [onboardingSeen, setOnboardingSeen] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    AsyncStorage.getItem(ONBOARDING_SEEN_KEY).then((value) => {
+      setOnboardingSeen(value === "true");
+    });
+  }, []);
+
+  if (onboardingSeen === null) {
+    return <View style={{ flex: 1, backgroundColor: theme.colors.background }} />;
+  }
+
+  if (!onboardingSeen) {
+    return (
+      <>
+        <StatusBar style={resolvedScheme === "dark" ? "light" : "dark"} />
+        <Screens.OnboardingScreen
+          onDone={() => {
+            AsyncStorage.setItem(ONBOARDING_SEEN_KEY, "true").catch(() => {});
+            setOnboardingSeen(true);
+          }}
+        />
+      </>
+    );
+  }
 
   return (
     <NavigationContainer
