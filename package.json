@@ -12,6 +12,7 @@
     "test": "echo \"No tests specified\" && exit 0"
   },
   "dependencies": {
+    "@expo-google-fonts/bricolage-grotesque": "^0.4.1",
     "@metaplex-foundation/mpl-bubblegum": "^5.1.0",
     "@metaplex-foundation/umi": "^1.5.1",
     "@metaplex-foundation/umi-bundle-defaults": "^1.5.1",
@@ -33,6 +34,7 @@
     "expo-clipboard": "~7.0.1",
     "expo-crypto": "~14.0.2",
     "expo-dev-client": "~5.0.19",
+    "expo-font": "~13.0.4",
     "expo-status-bar": "~2.0.1",
     "expo-system-ui": "~4.0.9",
     "react": "18.3.1",

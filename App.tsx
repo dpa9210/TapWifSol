@@ -14,6 +14,7 @@ import {
   useThemePreference,
 } from "./src/utils/ThemePreferenceProvider";
 import { TapWifSolDarkTheme, TapWifSolLightTheme } from "./src/theme";
+import { useBrandFonts } from "./src/hooks/useBrandFonts";
 
 const queryClient = new QueryClient();
 
@@ -21,13 +22,14 @@ function ThemedApp() {
   const { resolvedScheme } = useThemePreference();
   const theme =
     resolvedScheme === "dark" ? TapWifSolDarkTheme : TapWifSolLightTheme;
+  const fontsLoaded = useBrandFonts();
 
   return (
     <SafeAreaView
       style={[styles.shell, { backgroundColor: theme.colors.background }]}
     >
       <PaperProvider theme={theme}>
-        <AppNavigator />
+        {fontsLoaded ? <AppNavigator /> : null}
       </PaperProvider>
     </SafeAreaView>
   );

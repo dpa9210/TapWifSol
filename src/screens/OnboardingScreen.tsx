@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Avatar, Button, Text, useTheme } from "react-native-paper";
 import MaterialCommunityIcon from "@expo/vector-icons/MaterialCommunityIcons";
+import { BRAND_FONT_EXTRABOLD } from "../hooks/useBrandFonts";
 
 type Slide = {
   icon: React.ComponentProps<typeof MaterialCommunityIcon>["name"];
@@ -109,7 +110,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   title: {
-    fontWeight: "bold",
+    fontFamily: BRAND_FONT_EXTRABOLD,
     textAlign: "center",
     marginTop: 24,
     marginBottom: 12,

@@ -2,6 +2,7 @@ import React from "react";
 import { Linking, ScrollView, StyleSheet, View } from "react-native";
 import { Avatar, Divider, List, Text, useTheme } from "react-native-paper";
 import MaterialCommunityIcon from "@expo/vector-icons/MaterialCommunityIcons";
+import { BRAND_FONT_EXTRABOLD } from "../hooks/useBrandFonts";
 
 const HOW_IT_WORKS: {
   icon: React.ComponentProps<typeof MaterialCommunityIcon>["name"];
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
     marginLeft: 14,
   },
   title: {
-    fontWeight: "bold",
+    fontFamily: BRAND_FONT_EXTRABOLD,
   },
   intro: {
     lineHeight: 22,

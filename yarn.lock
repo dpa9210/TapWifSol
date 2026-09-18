@@ -1299,6 +1299,11 @@
     ethereum-cryptography "^2.0.0"
     micro-ftch "^0.3.1"
 
+"@expo-google-fonts/bricolage-grotesque@^0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/bricolage-grotesque/-/bricolage-grotesque-0.4.1.tgz#6fcdf1211601034dda9656ad090e52fd15f517d0"
+  integrity sha512-uijLLg+thOrFgw+gXtYA3dQJTBqqqleabcNFpamaYXqUUcbFe0J18C+4nfL0CyGzSJUicxUBLY4Zv7jdHmTGMA==
+
 "@expo/bunyan@^4.0.0":
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/@expo/bunyan/-/bunyan-4.0.1.tgz#ab9e17e36c71c704a0ce72168378a487368da736"

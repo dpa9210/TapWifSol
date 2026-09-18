@@ -6,6 +6,7 @@ import { Section } from "../Section";
 import { useAuthorization } from "../utils/useAuthorization";
 import { AccountDetailFeature } from "../components/account/account-detail-feature";
 import { SignInFeature } from "../components/sign-in/sign-in-feature";
+import { BRAND_FONT_EXTRABOLD } from "../hooks/useBrandFonts";
 
 export function HomeScreen() {
   const { selectedAccount } = useAuthorization();
@@ -69,7 +70,7 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   title: {
-    fontWeight: "bold",
+    fontFamily: BRAND_FONT_EXTRABOLD,
   },
   buttonGroup: {
     flexDirection: "column",
