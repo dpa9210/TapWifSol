@@ -26,6 +26,11 @@ android/.gradle/
 android/local.properties
 android/app/.cxx/
 
+# Release signing key + its password (android/app/*.jks already covered by
+# the *.jks rule above) — losing this file means losing the ability to ever
+# publish an update under this app's identity, but it must never be committed.
+android/keystore.properties
+
 # Metro
 .metro-health-check*
 metro.log

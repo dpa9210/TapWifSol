@@ -12,7 +12,10 @@ export function BrandIcon({ size = 44 }: { size?: number }) {
     <Avatar.Image
       size={size}
       source={require("../../assets/adaptive-icon.png")}
-      style={{ backgroundColor: theme.colors.primaryContainer }}
+      // Deliberately not primaryContainer: the icon's own "back phone" shape
+      // is filled with that exact color, so on a matching backdrop it reads
+      // as a bare outline instead of a solid silhouette.
+      style={{ backgroundColor: theme.colors.surfaceVariant }}
     />
   );
 }
