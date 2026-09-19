@@ -4,6 +4,10 @@ A mobile tap-to-pay app for the [Solana Mobile Hackathon](https://solanamobile.c
 
 Currently running on **devnet** for development and testing.
 
+[![Download APK](https://img.shields.io/badge/Download-APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/dpa9210/TapWifSol/releases/download/v1.0.0/app-release.apk)
+
+Signed release build, v1.0.0 (~87 MB) — sideload it directly, no Metro/dev server needed. You'll need "install from unknown sources" enabled for whatever app you download it with.
+
 ## Why
 
 Most Solana Pay demos are QR-only. This app treats NFC tap-to-pay (via Android Host Card Emulation) as a first-class transport alongside QR, so it actually exercises the phone's hardware rather than just wrapping a payment link in an app shell — the kind of thing the Solana Mobile hardware track rewards.
